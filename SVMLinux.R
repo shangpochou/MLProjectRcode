@@ -1,0 +1,55 @@
+library(e1071)
+#library(plot3D)
+#library(ridge)
+#library(parcor)
+#library(lars)
+#library(glmnet)
+#setwd("D:/My_Documents/BerkeleyFall/ENG290A/Project/RawData")
+InputData = read.csv("MLdataSet_Raw.csv")
+#View(InputData)
+InputSample = InputData[sample(nrow(InputData),size=10000,replace=FALSE),]
+x <- subset(InputSample, select = -ifBlocking)
+y <- subset(InputSample, select = ifBlocking)
+#x <- subset(InputData, select = -ifBlocking)
+#y <- subset(InputData, select = ifBlocking)
+#View(x)
+#View(y)
+xMatrix=matrix(c(x[,1],x[,2],x[,3],x[,4],x[,5],x[,6],x[,7]), nrow=nrow(x))
+yMatrix = matrix(c(y[,1]), nrow = nrow(y))
+
+#model <- svm(x, y) 
+
+#print(model)
+#summary(model)
+
+gammaSeq = seq(from = 1, to = 10, by = 1)
+costSeq = seq(from = 1, to = 10, by = 1)
+degSeq = seq(from= 1, to = 3, by = 1)
+
+#tuned <- tune.svm(xMatrix,yMatrix, data = InputSample,  gamma = gammaSeq, cost = costSeq)
+#summary(tuned)
+
+Polytuned <- tune.svm(xMatrix,yMatrix, data = InputSample, kernal = "polynomial", gamma = 10^(-1:1), cost = 10^(-2:-1), coef0 = 10^(-1:1), degree = degSeq)
+summary(Polytuned)
+#jpeg("polytuned.jpg")
+#plot(Polytuned, type = "contour", nlevels = 10)
+#dev.off()
+
+RBStuned <- tune.svm(xMatrix,yMatrix, data = InputSample, kernal = "radial basis", gamma = 10^(-1:1), cost = 10^(-2:-1))
+summary(RBStuned)
+jpeg("RBStuned.jpg")
+plot(RBStuned, type = "contour", nlevels = 10)
+dev.off()
+
+Lineartuned <- tune.svm(xMatrix,yMatrix, data = InputSample, kernal = "linear",  cost = 10^(-2:-1))
+summary(Lineartuned)
+jpeg("Lineartuned.jpg")
+plot(Lineartuned, type = "contour", nlevels = 10)
+dev.off()
+
+
+SigMoidtuned <- tune.svm(xMatrix,yMatrix, data = InputSample, kernal = "sigmoid", gamma = 10^(-1:1), coef0 = 10^(-1:1), cost = 10^(-2:-1))
+summary(SigMoidtuned)
+#jpeg("SigMoidtuned.jpg")
+#plot(SigMoidtuned, type = "contour", nlevels = 10)
+#dev.off()
